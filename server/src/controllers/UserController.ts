@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import userService from "../services/UserService";
 import UserDto from "../dto/UserDto";
+import type { IUser } from "../models/user-model";
 
 class UserController {
   async registration(req: Request<unknown, unknown, UserDto>, res: Response) {
@@ -20,28 +21,33 @@ class UserController {
   async login(req: Request, res: Response) {
     try {
     } catch (e) {
-        res.status(500).send((e as Error).message);
+      res.status(500).send((e as Error).message);
     }
   }
 
-  async activate(req: Request, res: Response) {
+  async activate(req: Request<Pick<IUser, "activaionLink">>, res: Response) {
     try {
+      const activaionLink = req.params.activaionLink;
+
+      await userService.activate(activaionLink);
+
+      return res.redirect(process.env.CLIENT_URL);
     } catch (e) {
-        res.status(500).send((e as Error).message);
+      res.status(500).send((e as Error).message);
     }
   }
 
   async logout(req: Request, res: Response) {
     try {
     } catch (e) {
-        res.status(500).send((e as Error).message);
+      res.status(500).send((e as Error).message);
     }
   }
 
   async refresh(req: Request, res: Response) {
     try {
     } catch (e) {
-        res.status(500).send((e as Error).message);
+      res.status(500).send((e as Error).message);
     }
   }
 }

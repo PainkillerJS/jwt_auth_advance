@@ -3,7 +3,6 @@ import { v4 as uuid } from "uuid";
 
 import userModel from "../models/user-model";
 import { UserRegistrationError } from "../constants/UserError";
-import mailService from "./MailService";
 import tokenService from "./TokenService";
 
 class UserService {
@@ -19,13 +18,24 @@ class UserService {
     const user = await userModel.create(userData);
     const tokens = await tokenService.generateToken({ email, isActivated: user.isActivated, _id: user._id });
 
-    await mailService.sendActivationEmail(email, activateLink);
     await tokenService.saveToken(user._id, tokens.refreshToken);
 
     return {
       ...tokens,
       user: userData
     };
+  }
+
+  async activate(activateLink: string) {
+    const user = await userModel.findOne({ activateLink });
+
+    if (!user) {
+      throw new Error(UserRegistrationError.USER_FOUND_ERROR);
+    }
+
+    user.isActivated = true;
+
+    await user.save();
   }
 }
 
