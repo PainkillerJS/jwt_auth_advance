@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 
+import ApiError from "../exceptions/apiError";
 import userModel from "../models/user-model";
 import { UserRegistrationError } from "../constants/UserError";
 import tokenService from "./TokenService";
@@ -8,7 +9,7 @@ import tokenService from "./TokenService";
 class UserService {
   async registration(email: string, password: string) {
     if (await userModel.findOne({ email })) {
-      throw new Error(UserRegistrationError.USER_FOUND_ERROR);
+      throw ApiError.BadRequest(UserRegistrationError.USER_FOUND_ERROR);
     }
 
     const hashPassword = await bcrypt.hash(password, 3);
@@ -30,7 +31,7 @@ class UserService {
     const user = await userModel.findOne({ activateLink });
 
     if (!user) {
-      throw new Error(UserRegistrationError.USER_FOUND_ERROR);
+      throw ApiError.BadRequest(UserRegistrationError.USER_FOUND_ERROR);
     }
 
     user.isActivated = true;
