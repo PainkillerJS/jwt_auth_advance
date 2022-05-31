@@ -3,5 +3,7 @@ export enum UserRegistrationError {
 }
 
 export enum UserAuthError {
-  USER_NO_AUTH_ERROR = "Пользователь не авторизован"
+  USER_NO_AUTH_ERROR = "Пользователь не авторизован",
+  USER_NO_REG_ERROR = "Пользователь не найден",
+  USER_WRONG_PASSWORD_ERROR = "Неверный пароль"
 }
