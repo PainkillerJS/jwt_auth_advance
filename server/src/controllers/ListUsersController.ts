@@ -1,11 +1,15 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
+
+import listUsersService from "../services/ListUserService";
 
 class ListUsersController {
-  async getUsers(req: Request, res: Response): Promise<void> {
+  async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      res.json({ mess: "frfr" });
+      const users = await listUsersService.getUsers();
+
+      return res.json(users);
     } catch (e) {
-      res.status(500).send((e as Error).message);
+      next((e as Error).message);
     }
   }
 }

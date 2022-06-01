@@ -27,4 +27,3 @@ export default class ApiError extends Error {
     return new ApiError({ status: 401, message, errors });
   }
 }
-

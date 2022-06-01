@@ -17,7 +17,7 @@ class UserService {
     const userData = { email, password: hashPassword, activateLink };
 
     const user = await userModel.create(userData);
-    const tokens = await tokenService.generateToken({ email, isActivated: user.isActivated, _id: user._id });
+    const tokens = await tokenService.generateTokens({ email, isActivated: user.isActivated, _id: user._id });
 
     await tokenService.saveToken(user._id, tokens.refreshToken);
 
@@ -40,7 +40,7 @@ class UserService {
       throw ApiError.BadRequest(UserAuthError.USER_WRONG_PASSWORD_ERROR);
     }
 
-    const tokens = await tokenService.generateToken({ email, isActivated: user.isActivated, _id: user._id });
+    const tokens = await tokenService.generateTokens({ email, isActivated: user.isActivated, _id: user._id });
     const userData = { email, password };
 
     await tokenService.saveToken(user._id, tokens.refreshToken);
@@ -67,6 +67,31 @@ class UserService {
     user.isActivated = true;
 
     await user.save();
+  }
+
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
+      throw ApiError.BadRequest(UserAuthError.USER_WRONG_REFRESH_TOKEN);
+    }
+
+    const userData = tokenService.validateRefreshToken(refreshToken);
+    const tokenFromDB = await tokenService.findToken(refreshToken);
+
+    if (!tokenFromDB || !userData) {
+      throw ApiError.UnAuthError();
+    }
+
+    const { email, isActivated, _id } = await userModel.findById(userData._id);
+
+    const userDto = { email, isActivated, _id };
+    const tokens = tokenService.generateTokens(userDto);
+
+    await tokenService.saveToken(userData._id, tokenFromDB.refreshToken);
+
+    return {
+      ...tokens,
+      user: userData
+    };
   }
 }
 
