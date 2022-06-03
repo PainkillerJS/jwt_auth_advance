@@ -11,10 +11,15 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URL = process.env.MONGO || "";
 
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api", router);
+app.use("/api/auth", router);
 app.use(errorMiddleware);
 
 async function startServer() {

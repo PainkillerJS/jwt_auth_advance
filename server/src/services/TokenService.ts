@@ -9,7 +9,7 @@ type payloadData = Pick<IUser, "_id" | "email" | "isActivated">;
 
 class TokenService {
   generateTokens(payload: payloadData) {
-    const accessToken = jwt.sign(payload, process.env.SECRET_ACCESS, { expiresIn: "30m" });
+    const accessToken = jwt.sign(payload, process.env.SECRET_ACCESS, { expiresIn: "15s" });
     const refreshToken = jwt.sign(payload, process.env.SECRET_REFRESH, { expiresIn: "30d" });
 
     return { accessToken, refreshToken };
@@ -20,6 +20,7 @@ class TokenService {
 
     if (tokenData) {
       tokenData.refreshToken = refreshToken;
+
       return tokenData.save();
     }
 

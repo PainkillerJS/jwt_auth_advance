@@ -23,7 +23,7 @@ class UserService {
 
     return {
       ...tokens,
-      user: userData
+      user: { email, isActivated: false, activateLink }
     };
   }
 
@@ -41,7 +41,7 @@ class UserService {
     }
 
     const tokens = await tokenService.generateTokens({ email, isActivated: user.isActivated, _id: user._id });
-    const userData = { email, password };
+    const userData = { email, isActivated: user.isActivated, activateLink: user.activaionLink };
 
     await tokenService.saveToken(user._id, tokens.refreshToken);
 
@@ -86,7 +86,7 @@ class UserService {
     const userDto = { email, isActivated, _id };
     const tokens = tokenService.generateTokens(userDto);
 
-    await tokenService.saveToken(userData._id, tokenFromDB.refreshToken);
+    await tokenService.saveToken(userData._id, tokens.refreshToken);
 
     return {
       ...tokens,
